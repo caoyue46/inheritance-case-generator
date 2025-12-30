@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>薪火相传有继承 - AI案例生成器</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+                background: #f5f5f5;
+                min-height: 100vh;
+                color: #333;
+                padding: 10px;
+            }
+            .header {
+                text-align: center;
+                margin-bottom: 10px;
+                background: #003366;
+                padding: 15px 20px;
+                border-radius: 12px;
+            }
+            .header h1 {
+                font-size: 52px;
+                font-weight: 700;
+                color: #ffffff;
+                letter-spacing: 8px;
+            }
+            .header .subtitle {
+                font-size: 24px;
+                color: #ffffff;
+                margin-top: 3px;
+                letter-spacing: 4px;
+                opacity: 0.9;
+            }
+            .main-card {
+                background: #ffffff;
+                border: 1px solid #ddd;
+                border-radius: 12px;
+                overflow: hidden;
+                display: grid;
+                grid-template-columns: 360px 1fr;
+                min-height: calc(100vh - 120px);
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+            .left-panel {
+                padding: 18px;
+                background: #fafafa;
+                border-right: 1px solid #eee;
+            }
+            .right-panel {
+                padding: 20px 30px;
+            }
+            .section-label {
+                font-size: 22px;
+                font-weight: 600;
+                color: #003366;
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                letter-spacing: 2px;
+            }
+            .section-label::before {
+                content: "";
+                width: 4px;
+                height: 18px;
+                background: #003366;
+            }
+            .chips-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                margin-bottom: 15px;
+            }
+            .chip {
+                background: #f8f9fa;
+                border: 1px solid #dee2e6;
+                padding: 10px 14px;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                font-size: 18px;
+                color: #495057;
+                user-select: none;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            .chip-icon {
+                font-size: 18px;
+                opacity: 0.8;
+            }
+            .chip:hover {
+                border-color: #003366;
+                background: #e8f4f8;
+                color: #003366;
+            }
+            .chip.selected {
+                background: #003366;
+                border-color: #003366;
+                color: #fff;
+            }
+            .chip.selected .chip-icon {
+                opacity: 1;
+            }
+            .input-group {
+                margin-bottom: 12px;
+            }
+            .input-group label {
+                display: block;
+                font-size: 18px;
+                color: #666;
+                margin-bottom: 6px;
+            }
+            .input-group input,
+            .input-group textarea {
+                width: 100%;
+                padding: 10px 12px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                font-size: 18px;
+                background: #fff;
+                color: #333;
+                font-family: inherit;
+            }
+            .input-group input::placeholder,
+            .input-group textarea::placeholder {
+                color: #aaa;
+            }
+            .input-group input:focus,
+            .input-group textarea:focus {
+                outline: none;
+                border-color: #003366;
+            }
+            .input-group textarea {
+                min-height: 55px;
+                resize: none;
+            }
+            .generate-btn {
+                width: 100%;
+                background: #003366;
+                color: #fff;
+                border: none;
+                padding: 14px;
+                border-radius: 6px;
+                font-size: 22px;
+                font-weight: 700;
+                cursor: pointer;
+                margin-top: 8px;
+                letter-spacing: 4px;
+            }
+            .generate-btn:hover {
+                background: #004488;
+            }
+            .generate-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+            .result-placeholder {
+                color: #aaa;
+                font-size: 28px;
+                text-align: center;
+                padding-top: 80px;
+                letter-spacing: 2px;
+            }
+            .result-section {
+                margin-bottom: 25px;
+            }
+            .result-label {
+                font-size: 22px;
+                font-weight: 600;
+                color: #003366;
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                letter-spacing: 2px;
+            }
+            .result-label::after {
+                content: "";
+                flex: 1;
+                height: 1px;
+                background: linear-gradient(90deg, #003366, transparent);
+            }
+            .case-text {
+                font-family: "KaiTi", "STKaiti", "楷体", serif;
+                font-size: 38px;
+                font-weight: 700;
+                line-height: 1.7;
+                color: #333;
+                text-indent: 2em;
+                padding: 20px;
+                background: #f0f8ff;
+                border-left: 4px solid #003366;
+                border-radius: 0 8px 8px 0;
+            }
+            .question-item {
+                font-size: 32px;
+                line-height: 1.7;
+                color: #333;
+                padding: 14px 0;
+                padding-left: 0.5em;
+                border-bottom: 1px solid #eee;
+            }
+            .question-item:last-child {
+                border-bottom: none;
+            }
+            .loading {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 20px;
+                padding: 60px;
+                font-size: 28px;
+                color: #003366;
+                letter-spacing: 2px;
+            }
+            .loading-spinner {
+                width: 50px;
+                height: 50px;
+                border: 3px solid #ddd;
+                border-top-color: #003366;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+            .error-box {
+                background: #fff0f0;
+                border: 1px solid #ffcccc;
+                padding: 25px;
+                color: #cc0000;
+                font-size: 22px;
+                text-align: center;
+                border-radius: 8px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>薪火相传有继承</h1>
+            <div class="subtitle">AI 智能案例生成器</div>
+        </div>
+        <div class="main-card">
+            <div class="left-panel">
+                <div class="section-label">选择家庭成员</div>
+                <div class="chips-container">
+                    <span
+                        class="chip"
+                        data-value="配偶"
+                        onclick="this.classList.toggle('selected')"
+                        ><span class="chip-icon">💑</span>配偶</span
+                    >
+                    <span
+                        class="chip"
+                        data-value="子女"
+                        onclick="this.classList.toggle('selected')"
+                        ><span class="chip-icon">👶</span>子女</span
+                    >
+                    <span
+                        class="chip"
+                        data-value="父母"
+                        onclick="this.classList.toggle('selected')"
+                        ><span class="chip-icon">👴</span>父母</span
+                    >
+                    <span
+                        class="chip"
+                        data-value="兄弟姐妹"
+                        onclick="this.classList.toggle('selected')"
+                        ><span class="chip-icon">👫</span>兄弟姐妹</span
+                    >
+                    <span
+                        class="chip"
+                        data-value="非婚生子女"
+                        onclick="this.classList.toggle('selected')"
+                        ><span class="chip-icon">👦</span>非婚生子女</span
+                    >
+                    <span
+                        class="chip"
+                        data-value="继子女"
+                        onclick="this.classList.toggle('selected')"
+                        ><span class="chip-icon">🧒</span>继子女</span
+                    >
+                    <span
+                        class="chip"
+                        data-value="祖父母"
+                        onclick="this.classList.toggle('selected')"
+                        ><span class="chip-icon">👵</span>祖父母</span
+                    >
+                    <span
+                        class="chip"
+                        data-value="有遗嘱"
+                        onclick="this.classList.toggle('selected')"
+                        ><span class="chip-icon">📜</span>有遗嘱</span
+                    >
+                </div>
+                <div class="section-label">补充信息</div>
+                <div class="input-group">
+                    <label>遗产情况</label>
+                    <input
+                        type="text"
+                        id="propertyInfo"
+                        placeholder="如：房产一套、存款50万"
+                    />
+                </div>
+                <div class="input-group">
+                    <label>特殊情节</label>
+                    <textarea
+                        id="specialCase"
+                        placeholder="如：其中一个子女长期未尽赡养义务..."
+                    ></textarea>
+                </div>
+                <button
+                    class="generate-btn"
+                    id="generateBtn"
+                    onclick="generateCase()"
+                >
+                    生 成 案 例
+                </button>
+            </div>
+            <div class="right-panel">
+                <div id="caseOutput">
+                    <div class="result-placeholder">选择家庭成员后点击生成</div>
+                </div>
+            </div>
+        </div>
+        <script>
+            function speakText(text) {
+                window.speechSynthesis.cancel();
+                var utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = "zh-CN";
+                utterance.rate = 0.85;
+                window.speechSynthesis.speak(utterance);
+            }
+            async function generateCase() {
+                var sel = [];
+                var chips = document.querySelectorAll(".chip.selected");
+                for (var i = 0; i < chips.length; i++) {
+                    sel.push(chips[i].getAttribute("data-value"));
+                }
+                if (sel.length === 0) {
+                    alert("请至少选择一个家庭成员");
+                    return;
+                }
+                var prop = document.getElementById("propertyInfo").value;
+                var spec = document.getElementById("specialCase").value;
+                var out = document.getElementById("caseOutput");
+                var btn = document.getElementById("generateBtn");
+                out.innerHTML =
+                    '<div class="loading"><div class="loading-spinner"></div><div>AI 正在思考生成中...</div></div>';
+                btn.disabled = true;
+                window.speechSynthesis.cancel();
+                var p =
+                    "你是高中政治教师，请生成一个继承法案例。\\n\\n【案例风格】模仿以下范例的简洁风格：\\n「王大爷与李阿姨婚后育有一子一女，名下有房产一套、存款80万元。王大爷立自书遗嘱将全部财产留给儿子。王大爷去世后，女儿认为遗嘱不公平，要求按法定继承分割遗产，诉至法院。」\\n\\n【知识点范围】\\n1.继承需先从夫妻共同财产中析产\\n2.法定继承顺序：第一顺序（配偶、子女、父母）、第二顺序（兄弟姐妹、祖父母外祖父母）\\n3.子女包括：婚生子女、非婚生子女、养子女、有扶养关系的继子女\\n4.遗嘱继承只能在法定继承人范围内指定\\n5.丧偶儿媳对公婆尽了主要赡养义务的，作为第一顺序继承人\\n6.遗赠是将财产给法定继承人以外的人\\n7.遗赠扶养协议\\n8.遗嘱继承优先于法定继承\\n9.代书遗嘱须有两个以上无利害关系见证人\\n10.立有数份遗嘱内容相抵触的，以最后遗嘱为准\\n\\n家庭成员：" +
+                    sel.join("、") +
+                    "\\n" +
+                    (prop ? "遗产：" + prop + "\\n" : "") +
+                    (spec ? "特殊情况：" + spec + "\\n" : "") +
+                    "\\n【严格要求】\\n1. 案例100字以内，语言简洁\\n2. 案例必须以诉至法院结尾，形成需要法院判决的情境\\n3. 用亲切称呼如「王大爷」「李阿姨」\\n4. 只输出案例描述，不要生成问题，不要生成答案\\n\\n请只输出案例描述，格式如下：\\n\\n案例描述：（100字以内的案例，以诉至法院结尾）";
+                try {
+                    var r = await fetch("http://localhost:3456/chat", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ prompt: p }),
+                    });
+                    var d = await r.json();
+                    if (d.success) {
+                        var t = d.text;
+                        var ct = t.replace(/^案例描述[：:]?\\s*/, "").trim();
+                        var qt = "法院该怎么判该案例？";
+                        var qh = '<div class="question-item">' + qt + "</div>";
+                        out.innerHTML =
+                            '<div class="result-section"><div class="case-text">' +
+                            ct +
+                            '</div></div><div class="result-section"><div class="result-label">问题</div>' +
+                            qh +
+                            "</div>";
+                        setTimeout(function () {
+                            speakText(ct + "。问题：" + qt);
+                        }, 500);
+                    } else {
+                        throw new Error("fail");
+                    }
+                } catch (e) {
+                    out.innerHTML =
+                        '<div class="error-box">请先运行「1-双击启动.bat」再点生成</div>';
+                }
+                btn.disabled = false;
+            }
+        </script>
+    </body>
+</html>

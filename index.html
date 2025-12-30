@@ -411,20 +411,29 @@
                         var ct = "",
                             qt = "";
                         var caseMatch = t.match(
-                            /案例[：:]\s*([\s\S]*?)(?=问题[：:]|$)/,
+                            /案例[：:]\s*([\s\S]*?)(?=#+\s*问题|问题[：:]|$)/,
                         );
                         var qMatch = t.match(/问题[：:]\s*([\s\S]*?)$/);
                         if (caseMatch) {
-                            ct = caseMatch[1].trim();
+                            ct = caseMatch[1]
+                                .trim()
+                                .replace(/^#+\s*/, "")
+                                .replace(/\s*#+\s*$/, "");
                         } else {
-                            ct = t.replace(/^案例[：:]?\s*/, "").trim();
+                            ct = t
+                                .replace(/^案例[：:]?\s*/, "")
+                                .replace(/^#+\s*/, "")
+                                .trim();
                         }
                         if (qMatch) {
-                            qt = qMatch[1].trim();
+                            qt = qMatch[1].trim().replace(/^#+\s*/, "");
                         } else {
                             qt = "法院应如何判决？";
                         }
-                        var qh = '<div class="question-item">' + qt + "</div>";
+                        var qh =
+                            '<div class="question-item" style="text-indent:2em;">' +
+                            qt +
+                            "</div>";
                         out.innerHTML =
                             '<div class="result-section"><div class="result-label">案例描述</div><div class="case-text">' +
                             ct +

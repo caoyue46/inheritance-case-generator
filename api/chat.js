@@ -1,7 +1,7 @@
 const https = require("https");
 
 const API_KEY =
-  "sk-cp-HnarWC12SAaf7zlBclz9mp_QyUQ-RuhPFUL4UuJ1fL5EwYw4YFJ1sXdm41j1qVWyvyYcFZvt3Za1tXOI3nZiRPxuHHmZMFhTzL8T3FuiZjVofk84UzXLg90";
+  "sk-cp-L3WwjLxiUd7Iad5eqmfkbllAXy9SDiGfMfqF_PRaDooKs1uZYJDMCvopoLG14wdl2EwDJ1Q8bQncbLK41bjVy6IoBulBa4lDSH9Gg_rbvytmr4qgJb5vcKo";
 
 module.exports = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");

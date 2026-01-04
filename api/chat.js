@@ -1,7 +1,6 @@
 const https = require("https");
 
-const API_KEY =
-  "sk-cp-L3WwjLxiUd7Iad5eqmfkbllAXy9SDiGfMfqF_PRaDooKs1uZYJDMCvopoLG14wdl2EwDJ1Q8bQncbLK41bjVy6IoBulBa4lDSH9Gg_rbvytmr4qgJb5vcKo";
+const API_KEY = process.env.MINIMAX_API_KEY;
 
 module.exports = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");

@@ -3,13 +3,14 @@ const https = require("https");
 const fs = require("fs");
 const path = require("path");
 
-const API_KEY = "sk-cp-HnarWC12SAaf7zlBclz9mp_QyUQ-RuhPFUL4UuJ1fL5EwYw4YFJ1sXdm41j1qVWyvyYcFZvt3Za1tXOI3nZiRPxuHHmZMFhTzL8T3FuiZjVofk84UzXLg90";
-const PORT = 3456;
+// 从环境变量读取 API 密钥（生产环境）或使用默认值（本地开发）
+const API_KEY = process.env.MINIMAX_API_KEY || "";
+const PORT = process.env.PORT || 3456;
 
 const server = http.createServer((req, res) => {
   // 处理根路径 - 返回HTML页面
   if (req.method === "GET" && (req.url === "/" || req.url === "/index.html")) {
-    const htmlPath = path.join(__dirname, "薪火相传有继承.html");
+    const htmlPath = path.join(__dirname, "index.html");
     fs.readFile(htmlPath, "utf8", (err, data) => {
       if (err) {
         res.writeHead(404);
@@ -35,6 +36,12 @@ const server = http.createServer((req, res) => {
 
   // 处理AI请求
   if (req.method === "POST" && req.url === "/chat") {
+    if (!API_KEY) {
+      res.writeHead(500, { "Content-Type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify({ success: false, error: "API密钥未配置" }));
+      return;
+    }
+
     let body = "";
     req.on("data", (chunk) => {
       body += chunk;
@@ -114,10 +121,9 @@ server.listen(PORT, () => {
   console.log("  薪火相传有继承 - AI案例生成器");
   console.log("==================================================");
   console.log("");
-  console.log("  服务已启动！请打开浏览器访问：");
+  console.log("  服务已启动！");
+  console.log("  端口: " + PORT);
+  console.log("  API密钥: " + (API_KEY ? "已配置" : "未配置"));
   console.log("");
-  console.log("  http://localhost:" + PORT);
-  console.log("");
-  console.log("  按 Ctrl+C 停止服务");
   console.log("==================================================");
 });

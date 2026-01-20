@@ -2,7 +2,11 @@
   "name": "inheritance-case-generator",
   "version": "1.0.0",
   "description": "薪火相传有继承 - AI智能案例生成器",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
